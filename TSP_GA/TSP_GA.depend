@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1498167061 source:c:\users\lenovo\travelling-merchant\tsp_ga\main.cpp
+	<iostream>
+	<vector>
+	<algorithm>
+
