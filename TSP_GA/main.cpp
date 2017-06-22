@@ -38,7 +38,7 @@ public:
     float getChance(){return breedingChance;}           //for getting chance value
 };
 
-bool fitnessComparator(Solution a, Solution b){return (a.giveFitness()<b.giveFitness());}
+bool fitnessComparator(Solution a, Solution b){return (a.giveFitness()<b.giveFitness());}   //comparator method which checks the fitness values of the compared solutions
 
 class Breeder{
 protected:
