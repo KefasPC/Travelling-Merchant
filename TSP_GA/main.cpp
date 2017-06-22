@@ -43,10 +43,30 @@ bool fitnessComparator(Solution a, Solution b){return (a.giveFitness()<b.giveFit
 class Breeder{
 protected:
     vector<vector<Solution> > generations;
+    int genSize;
 public:
+    Breeder(int g_size){
+        genSize=g_size;
+        vector<int> ctList;
+        for(int i=0;i<cities_table.size();i++){ctList.push_back(i);}
+        for(int i=0;i<g_size;i++){
+            vector<Solution> tmp;
+            vector<int> insrt=ctList;
+            random_shuffle(insrt.begin(),insrt.end());
+            Solution sltn(insrt);
+            sltn.cFitness();
+            tmp.push_back(sltn);
+        }
+    }
 
     void GenSort(int targetGen){
     sort(generations[targetGen].begin(),generations[targetGen].end(),fitnessComparator);
+    }
+
+    void GenChances(int targetGen){
+        for(int i=0; i<genSize;i++){
+
+        }
     }
 
 };
