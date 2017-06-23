@@ -64,7 +64,8 @@ public:
             sltn.cFitness();
             tmp.push_back(sltn);
         }
-    }
+    };
+    ~Breeder(){};
 
     void GenSort(){
     sort(generations[currGen].begin(),generations[currGen].end(),fitnessComparator);
@@ -127,18 +128,28 @@ public:
         }
         int fatherId,motherId;
         srand(time(NULL));
-        fatherId=rand()%genSize;
-        do{
-        motherId=rand()%genSize;
-        }while(fatherId!=motherId);
+        for(int c=0; c<(genSize/2); c++){
+            fatherId=0;
+            motherId=0;
+            fatherId=rand()%genSize;
+            do{
+            motherId=rand()%genSize;
+            }while(fatherId!=motherId);
 
-        //
+            vector<vector<int> > chldrn=breedingMethod(fatherId,motherId);
+            Solution childOne(chldrn[0]);
+            newGen.push_back(childOne);
+            Solution childTwo(chldrn[1]);
+            newGen.push_back(childTwo);
+        }
 
         currGen++;
     }
+
 };
 
 int main(){
+cout<<"testing";
 
 return 0;
 }
