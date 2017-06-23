@@ -4,14 +4,18 @@
 #include<math.h>    //exponential, sqrt,
 #include<stdlib.h>  //rand
 #include<time.h>
+#include<string>
 //#include<random>
 
 using namespace std;
 
 static int PI=3.14159265359;
-extern vector<vector<float> > cities_table;
-extern float fairnessFactor;
-extern float mixingRatio;
+
+string presetFilename="ctPreset.txt";
+vector<vector<float> > cities_table;
+int populationSize=10;
+float fairnessFactor=1;
+string saveFilename="save.txt";
 
 class Solution{
 private:
@@ -148,8 +152,74 @@ public:
 
 };
 
+//"Start","Change City Preset","Change population size","Change fairness factor","Set Savename","Exit program"
+
+string displayMenu(int menuNum){
+    cout<<"\x1B[2J\x1B[H";
+    cout<<"Menu:"<<endl;
+    cout<<"-------------------------------------"<<endl;
+    cout<<"1.Start"<<endl;
+    cout<<"2.Change City Preset"<<endl;
+        if(menuNum==1){cout<<"\tCurrent filename: "<<presetFilename<<endl;}
+    cout<<"3.Change population size"<<endl;
+        if(menuNum==2){cout<<"\tCurrent pop. size: "<<populationSize<<endl;}
+    cout<<"4.Change fairness factor"<<endl;
+        if(menuNum==3){cout<<"\tCurrent factor value: "<<fairnessFactor<<endl;}
+    cout<<"5.Set Savename"<<endl;
+        if(menuNum==4){cout<<"\tCurrent filename: "<<saveFilename<<endl;}
+    cout<<"6.Exit program"<<endl;
+    cout<<endl;
+    cout<<"-------------------------------------"<<endl;
+    cout<<"Input: ";
+    string choice;
+    cin>>choice;
+    return choice;
+}
+
+int stringToNumbers(string in){
+    if(in.length()==1){
+        if(in=="0")return 0;
+        if(in=="1")return 1;
+        if(in=="2")return 2;
+        if(in=="3")return 3;
+        if(in=="4")return 4;
+        if(in=="5")return 5;
+        if(in=="6")return 6;
+    }
+    else return -1;
+}
+
 int main(){
-cout<<"testing";
+    string mch;
+    int menu=0;
+    bool goTime=false;
+    bool close=false;
+    mch=displayMenu(menu);
+    menu=stringToNumbers(mch);
+    while(goTime || close){
+        switch(menu){
+        case 1:
+            goTime=true;
+        break;
+        case 2:
+            presetFilename=mch;
+        break;
+        case 3:
+        populationSize=stringToNumbers(displayMenu(menu));
+        break;
+        case 4:
+            fairnessFactor=stringToNumbers(displayMenu(menu));
+        break;
+        case 5:
+            saveFilename=mch;
+        break;
+        case 6:
+            close=true;
+        break;
+        }
+    }
+
+    //here
 
 return 0;
 }
