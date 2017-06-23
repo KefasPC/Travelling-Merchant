@@ -5,16 +5,20 @@
 #include<stdlib.h>  //rand
 #include<time.h>
 #include<string>
+#include<fstream>
+#include<conio.h>
 //#include<random>
+
+#define PI 3.14159265359
 
 using namespace std;
 
-static int PI=3.14159265359;
-
 string presetFilename="ctPreset.txt";
 vector<vector<float> > cities_table;
+int citiesNumber=0;
 int populationSize=10;
 float fairnessFactor=1;
+int impatience=5;
 string saveFilename="save.txt";
 
 class Solution{
@@ -45,6 +49,12 @@ public:
     float getChance(){return breedingChance;}           //for getting chance value
 
     vector<int> getDna(){return dna;}
+
+    void display(){
+        cout<<"("<<dna[0];
+        for(int i=1; i<citiesNumber; i++) cout<<";"<<dna[i];
+        cout<<")";
+    }
 };
 
 bool fitnessComparator(Solution a, Solution b){return (a.giveFitness()<b.giveFitness());}   //comparator method which checks the fitness values of the compared solutions
@@ -146,28 +156,55 @@ public:
             Solution childTwo(chldrn[1]);
             newGen.push_back(childTwo);
         }
-
+        GenSort();
+        GenChances();
         currGen++;
     }
 
+    bool isProgressing(){
+        int whenLastChange=0;
+        int i=0;
+        while(whenLastChange==0){
+            if(generations[currGen-i][1].giveFitness()!=generations[currGen][1].giveFitness()){
+                whenLastChange=i;
+            }
+        }
+        if(whenLastChange>impatience)return false;
+        else return true;
+    }
+
+    void displayWork(){
+        generations[currGen][0].display();
+        for(int i=1; i<citiesNumber; i++){
+                cout<<"\t";
+                generations[currGen][i].display();
+        }
+        cout<<endl;
+        cout<<generations[currGen][0].giveFitness();
+        for(int i=1; i<citiesNumber; i++){
+                cout<<"\t";
+                cout<<generations[currGen][i].giveFitness();
+        }
+        cout<<endl;
+    }
 };
 
-//"Start","Change City Preset","Change population size","Change fairness factor","Set Savename","Exit program"
-
 string displayMenu(int menuNum){
-    cout<<"\x1B[2J\x1B[H";
+    cout<<"\e[1;1H\e[2J";
     cout<<"Menu:"<<endl;
     cout<<"-------------------------------------"<<endl;
     cout<<"1.Start"<<endl;
     cout<<"2.Change City Preset"<<endl;
-        if(menuNum==1){cout<<"\tCurrent filename: "<<presetFilename<<endl;}
+        if(menuNum==2){cout<<"\tCurrent filename: "<<presetFilename<<endl;}
     cout<<"3.Change population size"<<endl;
-        if(menuNum==2){cout<<"\tCurrent pop. size: "<<populationSize<<endl;}
+        if(menuNum==3){cout<<"\tCurrent pop. size: "<<populationSize<<endl;}
     cout<<"4.Change fairness factor"<<endl;
-        if(menuNum==3){cout<<"\tCurrent factor value: "<<fairnessFactor<<endl;}
-    cout<<"5.Set Savename"<<endl;
-        if(menuNum==4){cout<<"\tCurrent filename: "<<saveFilename<<endl;}
-    cout<<"6.Exit program"<<endl;
+        if(menuNum==4){cout<<"\tCurrent factor value: "<<fairnessFactor<<endl;}
+    cout<<"5.Change the value of impatience"<<endl;
+        if(menuNum==5){cout<<"\tCurrent impatience value: "<<impatience<<endl;}
+    cout<<"6.Set Savename"<<endl;
+        if(menuNum==6){cout<<"\tCurrent filename: "<<saveFilename<<endl;}
+    cout<<"7.Exit program"<<endl;
     cout<<endl;
     cout<<"-------------------------------------"<<endl;
     cout<<"Input: ";
@@ -189,6 +226,12 @@ int stringToNumbers(string in){
     else return -1;
 }
 
+float citiesRoads(string in){
+    float out=0;
+    for(int i=0; i<in.length(); i++) out+=(char(in[i])-48)*10^in.length();
+    return out;
+}
+
 int main(){
     string mch;
     int menu=0;
@@ -196,7 +239,7 @@ int main(){
     bool close=false;
     mch=displayMenu(menu);
     menu=stringToNumbers(mch);
-    while(goTime || close){
+    while(!goTime || !close){
         switch(menu){
         case 1:
             goTime=true;
@@ -211,15 +254,42 @@ int main(){
             fairnessFactor=stringToNumbers(displayMenu(menu));
         break;
         case 5:
-            saveFilename=mch;
+            impatience=stringToNumbers(displayMenu(menu));
         break;
         case 6:
+            saveFilename=mch;
+        break;
+        case 7:
             close=true;
         break;
         }
     }
 
-    //here
+    ifstream cities;
+    cities.open(presetFilename.c_str());
+    string buffer;
+    cities>>buffer;
+    citiesNumber=int(citiesRoads(buffer));
+    for(int i=0; i<citiesNumber; i++){
+        vector<float> tmp;
+        cities>>buffer;
+        for(int j=0; j<citiesNumber; j++){
+            tmp.push_back(citiesRoads(buffer));
+        }
+        cities_table.push_back(tmp);
+    }
+
+    Breeder program(populationSize);
+    program.GenSort();
+    program.GenChances();
+    cout<<"\e[1;1H\e[2J";
+    program.displayWork();
+    while(goTime && !close){
+        program.breedSolutions();
+        program.displayWork();
+        if(!program.isProgressing()) goTime=false;
+        if(getch()==27) close==true;
+    }
 
 return 0;
 }
