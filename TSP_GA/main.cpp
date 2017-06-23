@@ -36,7 +36,7 @@ public:
     float giveFitness(){return fitness;}                //for getting the fitness value
 
     void setChance(int position,int genSize){           //determines the chance of getting the solution selected for breeding
-        breedingChance=2*3*expf((-9*position^2)/(genSize/2)^2)/(genSize/2*sqrt(2*PI));
+        breedingChance=fairnessFactor*(2*3*expf((-9*position^2)/(genSize/2)^2)/(genSize/2*sqrt(2*PI)));
     }
     float getChance(){return breedingChance;}           //for getting chance value
 
@@ -76,7 +76,7 @@ public:
         }
     }
 
-    vector<vector<int> > breedingMethod(int fthr_Id, int mthr_Id){      //crossover method
+    vector<vector<int> > breedingMethod(int fthr_Id, int mthr_Id){      //crossover method: PMX
        vector<int> papa=generations[currGen][fthr_Id].getDna();
        vector<int> mama=generations[currGen][mthr_Id].getDna();
        vector<int> childOne;
@@ -85,7 +85,35 @@ public:
        srand(time(NULL));
        int ctNbr=cities_table.size();
        int xpoint=rand()%ctNbr;
-       //
+       for(int i=0; i<ctNbr; i++){
+            childOne.push_back(0);
+            childTwo.push_back(0);
+       }
+       for(int i=0; i<=xpoint; i++){     //copying up until xpoint
+            childOne[i]=papa[i];
+            childTwo[i]=mama[i];
+       }
+       for(int i=xpoint+1; i<ctNbr; i++){//copying past xpoint
+            childOne[i]=mama[i];
+            childTwo[i]=papa[i];
+       }
+       int i=0;
+       int pfinder,mfinder;
+       for(int j=0; j<=xpoint; j++){    //gathering the children
+        mfinder=0;
+        pfinder=0;
+        while(i<=papa.size()){
+            if(mama[i]=childOne[j]) mfinder=i;
+            if(papa[i]=childTwo[j]) pfinder=i;
+            i++;
+        }
+        childOne[mfinder]=mama[j];
+        childTwo[pfinder]=papa[j];
+       }
+
+       children.push_back(childOne);
+       children.push_back(childTwo);
+       return children;
     }
 
     void breedSolutions(){
@@ -103,6 +131,7 @@ public:
         do{
         motherId=rand()%genSize;
         }while(fatherId!=motherId);
+
         //
 
         currGen++;
